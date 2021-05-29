@@ -22,3 +22,8 @@ variable username {
     type = string
     default = "hot-girl"
 }
+
+variable worker_count {
+    type = number
+    default = 3
+}

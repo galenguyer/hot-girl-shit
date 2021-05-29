@@ -51,31 +51,33 @@ resource "azurerm_network_security_group" "nsg" {
 }
 
 resource "azurerm_network_interface" "nic" {
-    name                        = "${var.rg_name}-nic"
+    count                       = var.worker_count
+    name                        = "${var.rg_name}-nic-${count.index}"
     location                    = var.rg_region
     resource_group_name         = azurerm_resource_group.rg.name
 
     ip_configuration {
-        name                          = "${var.rg_name}-nic-config"
+        name                          = "${var.rg_name}-nic-${count.index}-config"
         subnet_id                     = azurerm_subnet.subnet.id
         private_ip_address_allocation = "Dynamic"
     }
 }
 
-resource "azurerm_network_interface_security_group_association" "nic-nsg-association" {
-    network_interface_id      = azurerm_network_interface.nic.id
+resource "azurerm_subnet_network_security_group_association" "nic-subnet-association" {
+    subnet_id                 = azurerm_subnet.subnet.id
     network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 resource "azurerm_linux_virtual_machine" "vm" {
-    name                  = "${var.rg_name}-vm"
+    count                 = var.worker_count
+    name                  = "${var.rg_name}-vm-${count.index}"
     location              = var.rg_region
     resource_group_name   = azurerm_resource_group.rg.name
-    network_interface_ids = [azurerm_network_interface.nic.id]
+    network_interface_ids = [element(azurerm_network_interface.nic.*.id, count.index)]
     size                  = var.vm_size
 
     os_disk {
-        name                 = "${var.rg_name}-osdisk"
+        name                 = "${var.rg_name}-vm-${count.index}-osdisk"
         caching              = "ReadWrite"
         storage_account_type = "Standard_LRS"
     }
