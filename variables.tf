@@ -12,3 +12,13 @@ variable rg_region {
   type = string
   default = "eastus"
 }
+
+variable vm_size {
+    type = string
+    default = "Standard_B1ls"
+}
+
+variable username {
+    type = string
+    default = "hot-girl"
+}
