@@ -49,3 +49,15 @@ resource "azurerm_network_security_group" "nsg" {
         destination_address_prefix = "*"
     }
 }
+
+resource "azurerm_network_interface" "nic" {
+    name                        = "${var.rg_name}-nic"
+    location                    = var.rg_region
+    resource_group_name         = azurerm_resource_group.rg.name
+
+    ip_configuration {
+        name                          = "${var.rg_name}-nic-config"
+        subnet_id                     = azurerm_subnet.subnet.id
+        private_ip_address_allocation = "Dynamic"
+    }
+}
